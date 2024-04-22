@@ -10,7 +10,7 @@
 
     <nav class="navbar bg-body-tertiary ">
         <div class="container-fluid me-5">
-            <a class="navbar-brand">AskPupkin</a>
+            <a class="navbar-brand" href = "./index.html">AskPupkin</a>
             <form class="d-flex" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my_color_div" type="submit">ASK!</button>
@@ -23,8 +23,8 @@
                 <div class="d-flex flex-column justify-content-between">
                     <div>Dr. Pepper</div>
                     <div>
-                        <a href="/settings.html">Settings</a>
-                        <a href="/logout.html">Log out</a>
+                        <a href="./settings.html">Settings</a>
+                        <a href="./logout.html">Log out</a>
                     </div>
                 </div>
             </div>
@@ -45,59 +45,61 @@
             <div class="col-10">
 
                 <div class = "col-8 mb-3 mx-3">
-                    <article class="mb-3 w-100 float-left">
-                    <div class="row g-0">
-                      <div class="col-3 p-2">
-                        <div class="border w-100 mb-3" style="height: 100px">
-                          <img
-                            src="../img/avatar.png"
-                            class="img-fluid rounded-start"
-                            alt="..."
-                          />
-                        </div>
-                        <div class="input-group flex-nowrap">
-                          <input type="number" value="5" class="form-control" />
-                        </div>
-                      </div>
-                      <div class="col">
-                        <div class="card-body">
-                          <h5 class="card-title">
-                            Question?
-                          </h5>
-                          <p class="card-text">
-                            This is question text. This is a wider card with supporting text below as a natural
-                            lead-in to additional content. This content is a little bit
-                            longer.
-                          </p>
 
-                          <div class="row">
-                            <div class="col-8">
-                              <span>Tags</span>
-                              <a href="/tag.html">tag</a>
-                              <a href="/tag.html">tag</a>
-                              <a href="/tag.html">tag</a>
-                              <a href="/tag.html">tag</a>
-                              <a href="/tag.html">tag</a>
-                              <a href="/tag.html">tag</a>
+
+                    <article class="row card border-0 mb-3 w-100 float-left">
+                        <div class="row g-0">
+
+
+                          <div class="col-3 p-2">
+                            <div class="border w-100 mb-3" style="height: 100px">
+                              <img
+                                src="../static/img/avatar.png"
+                                class="img-fluid rounded-start"
+                                alt="..."
+                              />
+                            </div>
+                            <div class="input-group flex-nowrap">
+                              <input type="number" value="5" class="form-control" />
                             </div>
                           </div>
 
+                          <div class="col">
+                            <div class="card-body">
+                              <h5 class="card-title">
+                                Question?
+                              </h5>
+                              <p class="card-text">
+                                This is question text. This is a wider card with supporting text below as a natural
+                                lead-in to additional content. This content is a little bit
+                                longer.
+                              </p>
 
+                              <div class="row">
+                                <div class="col-8">
+                                  <span>Tags</span>
+                                  <a href="/tag.html">tag</a>
+                                  <a href="/tag.html">tag</a>
+                                  <a href="/tag.html">tag</a>
+                                </div>
+                              </div>
+
+
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                </article>
+                    </article>
 
-                    <hr/>
+                    <hr class = "row"/>
 
-                    <div class="overflow-auto">
+                    <div class="row overflow-auto">
 
                         <article class="card mb-3 w-100 float-left">
                             <div class="row g-0">
                               <div class="col-3 p-2">
                                 <div class="border w-100 mb-3" style="height: 100px">
                                   <img
-                                    src="../img/avatar.png"
+                                    src="../static/img/avatar.png"
                                     class="img-fluid rounded-start"
                                     alt="..."
                                   />
@@ -133,12 +135,12 @@
                         </article>
 
 
-                        <article class="card mb-3 w-100 float-left">
+                       <article class="card mb-3 w-100 float-left">
                             <div class="row g-0">
                               <div class="col-3 p-2">
                                 <div class="border w-100 mb-3" style="height: 100px">
                                   <img
-                                    src="../img/avatar.png"
+                                    src="../static/img/avatar.png"
                                     class="img-fluid rounded-start"
                                     alt="..."
                                   />
@@ -173,19 +175,27 @@
                             </div>
                         </article>
 
+
                     </div>
 
-                    <hr/>
+                    <hr class = "row" />
 
-                    <div class="my-3 row">
-                        <textarea class="form-control" rows = "3" id="textAnswer" placeholder="Enter your answer here"> </textarea>
-                    </div>
 
-                    <div class="my-3 row">
-                        <div class="col-sm-10">
-                          <button class = "my_color_div" type="submit" >Answer!</button>
+                    <form>
+                        <div class="form-group my-3 row">
+
+                            <div class="my-3 row">
+                                <textarea placeholder="Enter your answer here" class="form-control" rows = "3" id="textAnswer" ></textarea>
+                            </div>
+
+                            <div class="my-3 row">
+                                <div class="col-sm-10 ">
+                                  <button class=" btn-outline-success my_color_div" type="submit" >Answer!</button>
+                                </div>
+                             </div>
+
                         </div>
-                     </div>
+                    </form>
 
 
 
@@ -237,7 +247,7 @@
 
     <footer class="fixed-bottom p-3 bg-light">
       <div class="container">
-        <span class="text-muted">Footer </span>
+        <span class="text-muted"> </span>
       </div>
     </footer>
 
