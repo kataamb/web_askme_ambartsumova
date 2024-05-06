@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+        {% block user_head %}
+             <div class="d-flex justify-content-between gap-3">
+                <div class="border">
+                    <img src="{% static '/img/avatar.png' %}" width="50" height="50" />
+                </div>
+                <div class="d-flex flex-column justify-content-between">
+                    <div>Dr. Pepper</div>
+                    <div>
+                        <a href="./settings.html">Settings</a>
+                        <a href="./logout.html">Log out</a>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+
+        {% block title %}
+        <!--- category preaheader" -->
+        <div class = "row-1 m-3 d-flex gap-3 align-items-left">
+            <h2 class = " align-text-bottom"> <a href="/">New Questions</a>  </h2>
+            <h2 class = " align-text-bottom">  Hot Questions </h2>
+        </div>
+        {% endblock %}
+
+
+        {% block content %}
+
+                <div class = "col-8 mb-3 mx-3">
+                    {% for question in questions %}
+                        {% include "layouts/question_article.html" %}
+                    {% endfor %}
+
+                </div>
+
+        {% endblock %}
