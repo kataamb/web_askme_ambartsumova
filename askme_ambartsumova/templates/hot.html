@@ -2,18 +2,7 @@
 {% load static %}
 
         {% block user_head %}
-             <div class="d-flex justify-content-between gap-3">
-                <div class="border">
-                    <img src="{% static '/img/avatar.png' %}" width="50" height="50" />
-                </div>
-                <div class="d-flex flex-column justify-content-between">
-                    <div>Dr. Pepper</div>
-                    <div>
-                        <a href="./settings.html">Settings</a>
-                        <a href="./logout.html">Log out</a>
-                    </div>
-                </div>
-            </div>
+             {% include "layouts/authorized_block.html" %}
         {% endblock %}
 
         {% block title %}
@@ -25,13 +14,19 @@
         {% endblock %}
 
 
+
         {% block content %}
 
                 <div class = "col-8 mb-3 mx-3">
                     {% for question in questions %}
-                        {% include "layouts/question_article.html" %}
+                        {% include "layouts/question_article.html" with item=question %}
                     {% endfor %}
 
                 </div>
 
+        {% endblock %}
+
+
+        {% block pagination %}
+            {% include "layouts/pagination.html" with page_obj=questions page_content='hot'%}
         {% endblock %}

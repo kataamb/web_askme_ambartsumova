@@ -1,0 +1,53 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+    {% block user_head %}
+        {% include "layouts/unauthorized_block.html" %}
+    {% endblock %}
+
+    {% block title %}
+        <h2> Log in </h2>
+    {% endblock %}
+
+
+    {% block content %}
+         <form class="col-7 mb-3 mx-5">
+
+                         <!--error field -->
+                        <div class="mb-3 row">
+                            <p class="text-danger"> Sorry, wrong password! </p>
+                        </div>
+
+
+                         <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Login</label>
+                            <div class="col-sm-10">
+                              <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="Enter your login here" id="emailLogin">
+                            </div>
+                          </div>
+
+                          <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label">Password</label>
+                            <div class="col-sm-10">
+                              <input type="password" class="form-control" maxlength="50" id="passwordLogin">
+                            </div>
+                          </div>
+
+                         <div class="mb-3 row">
+                            <div class="col-sm-2">&nbsp;</div>
+                            <div class="col-sm-10">
+                              <button id = btnLogIn class = "btn btn-outline-success my_color_div" type="submit" >Log in!</button>
+                            </div>
+                         </div>
+
+                         <div class="mb-3 row">
+                            <div class="col-sm-2">&nbsp;</div>
+                            <div class="col-sm-10">
+                              <a href="{% url 'register' %}">create new account</a>
+                            </div>
+                         </div>
+
+
+                    </form>
+    {% endblock %}
+

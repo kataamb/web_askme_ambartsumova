@@ -1,0 +1,26 @@
+
+
+
+
+{% load static %}
+
+
+<hr class = "row"/>
+
+<div class="row overflow-auto">
+
+
+    {% for answer in answers %}
+        {% include "layouts/other_answer.html" with item=answer %}
+    {% endfor %}
+
+    {% block pagination %}
+        {% include "layouts/pagination_id.html" with page_obj=answers page_content='question' page_id=question.id %}
+    {% endblock %}
+
+
+
+
+</div>
+
+<hr class = "row" />
