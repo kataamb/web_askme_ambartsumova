@@ -71,42 +71,45 @@ Table AnswerLike {
 '''
 
 class Profile(models.Model):
-    id = models.AutoField(primary_key=True)
     avatar = models.ImageField(null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-class AnswerLike(models.Model):
-    id = models.AutoField(primary_key=True)
-    value = models.IntegerField()
-    user = models.OneToOneField(Profile, on_delete=models.PROTECT)
+
 
 class Answer(models.Model):
-    id = models.AutoField(primary_key=True)
     text_body = models.CharField(max_length=1000)
-    like = models.ForeignKey(AnswerLike, on_delete=models.CASCADE)
+    likes_count = models.IntegerField()
+
+
+
+class AnswerLike(models.Model):
+    value = models.IntegerField()
+    user = models.ForeignKey(Profile, on_delete=models.PROTECT)
+    answer = models.ForeignKey(Answer, on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = [['id', 'like']]
-
-
-
-class QuestionLike(models.Model):
-    id = models.AutoField(primary_key=True)
-    value = models.IntegerField()
-    user = models.OneToOneField(Profile, on_delete=models.PROTECT)
+        unique_together = ['user', 'answer']
 
 class Tag(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=15)
 
 class Question(models.Model):
-    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     text_body = models.CharField(max_length=1000)
-    answer = models.ForeignKey(Answer, on_delete = models.CASCADE)
-    like = models.ForeignKey(QuestionLike, on_delete = models.PROTECT)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
 
     tags = models.ManyToManyField(Tag, blank=True)
 
+class QuestionLike(models.Model):
+    value = models.IntegerField()
+    user = models.ForeignKey(Profile, on_delete=models.PROTECT)
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    likes_count = models.IntegerField()
+
     class Meta:
-        unique_together = [['id', 'like']]
+        unique_together = ['user', 'question']
+
+
+
+
+
