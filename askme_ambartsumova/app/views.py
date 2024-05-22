@@ -54,21 +54,6 @@ def paginate(objects_list, request, per_page=10):
 
 def index(request):
     QUESTIONS = Question.objects.new_questions()
-    print(QUESTIONS)
-
-    TGS = Question.objects.filter(tags__name="tag1")
-    print(len(TGS))
-
-    qst = Question.objects.all()[0]
-    print(qst.tags.all())
-
-    TGS = Question.objects.filter(tags__name="tag999")
-    print(len(TGS))
-
-    print(TGS[0].id)
-
-    tg = Tag.objects.all()[0]
-    print(tg.question_set.all())
 
     questions = paginate(QUESTIONS, request)
     return render(request, template_name="index.html", context={"questions" : questions})

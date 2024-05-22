@@ -14,8 +14,40 @@
 
 
 
-        {% block content %}
 
+        {% block content %}
+            <form class="col-7 mb-3 mx-5">
+
+                     <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Title</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" maxlength="50" id="titleQuestion">
+                        </div>
+                      </div>
+
+                      <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Text</label>
+                        <div class="col-sm-10">
+                          <textarea class="form-control" rows = "12" id="textQuestion"></textarea>
+                        </div>
+                      </div>
+
+                      <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Tags</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" maxlength="50" id="tagsQuestion" >
+                        </div>
+                      </div>
+
+                     <div class="mb-3 row">
+                        <div class="col-sm-2">&nbsp;</div>
+                        <div class="col-sm-10">
+                          <button class="btn btn-outline-success" type="submit">ASK!</button>
+                        </div>
+                     </div>
+
+
+            </form>
         {% endblock %}
 
 
