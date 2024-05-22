@@ -2,7 +2,7 @@
 {% load static %}
 
         {% block user_head %}
-             {% include "layouts/authorized_block.html" %}
+             {% include "components/authorized_block.html" %}
         {% endblock %}
 
         {% block title %}
@@ -19,7 +19,7 @@
 
                 <div class = "col-8 mb-3 mx-3">
                     {% for question in questions %}
-                        {% include "layouts/question_article.html" with item=question %}
+                        {% include "components/question_article.html" with item=question %}
                     {% endfor %}
 
                 </div>

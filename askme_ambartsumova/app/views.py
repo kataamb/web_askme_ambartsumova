@@ -3,6 +3,8 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.core.paginator import EmptyPage, PageNotAnInteger
 
+from app.models import*
+
 
 
 
@@ -12,7 +14,7 @@ TAGS = [
        "name" : i,
     } for i in ['bender', 'python', 'django', 'TechnoPark']
 ]
-
+'''
 QUESTIONS = [
     {
         "id" : i,
@@ -21,12 +23,14 @@ QUESTIONS = [
         "tags": TAGS[:3],
     } for i in range(200)
 ]
+'''
 
 ANSWERS = [
     {
         "id" : i,
         "title" : f"Answer {i}",
         "text" : f"This is answer number {i}",
+        "likes_count":1
     } for i in range(200)
 ]
 
@@ -49,11 +53,29 @@ def paginate(objects_list, request, per_page=10):
 
 
 def index(request):
+    QUESTIONS = Question.objects.new_questions()
+    print(QUESTIONS)
+
+    TGS = Question.objects.filter(tags__name="tag1")
+    print(len(TGS))
+
+    qst = Question.objects.all()[0]
+    print(qst.tags.all())
+
+    TGS = Question.objects.filter(tags__name="tag999")
+    print(len(TGS))
+
+    print(TGS[0].id)
+
+    tg = Tag.objects.all()[0]
+    print(tg.question_set.all())
+
     questions = paginate(QUESTIONS, request)
     return render(request, template_name="index.html", context={"questions" : questions})
 
 def hot(request):
-    questions = paginate(QUESTIONS[5:50:2], request, 5)
+    QUESTIONS = Question.objects.hot_questions()
+    questions = paginate(QUESTIONS, request, 5)
     return render(request, template_name="hot.html", context={"questions" : questions})
 
 def login(request):
@@ -70,11 +92,14 @@ def settings(request):
 
 
 def question(request, question_id):
+    QUESTIONS = Question.objects.all()
+
     question = QUESTIONS[question_id]
     answers = paginate(ANSWERS[:10], request, 2)
     return render(request, template_name="question.html", context={"question": question, "answers": answers})
 
 def tag(request, tag_slug):
-    questions = paginate(QUESTIONS[::5], request)
+    QUESTIONS = Question.objects.get_by_tag(tag_slug)
+    questions = paginate(QUESTIONS, request)
     return render(request, template_name="tag.html", context={"tag_name": tag_slug, "questions": questions})
 

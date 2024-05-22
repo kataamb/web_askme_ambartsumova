@@ -2,7 +2,7 @@
 {% load static %}
 
         {% block user_head %}
-            {% include "layouts/authorized_block.html" %}
+            {% include "components/authorized_block.html" %}
         {% endblock %}
 
 
@@ -27,7 +27,7 @@
                           />
                         </div>
                         <div class="input-group flex-nowrap">
-                          <input type="number" value="5" class="form-control" />
+                          <input type="number" value="{{ question.likes_count }}" class="form-control" />
                         </div>
                       </div>
 
@@ -43,7 +43,7 @@
                           <div class="row">
                             <div class="col-8">
                               <span>Tags</span>
-                                {% for tag in question.tags %}
+                                {% for tag in question.tags.all %}
                                     <a href="{% url 'tag' tag.name %}">{{ tag.name }}</a>
                                 {% endfor %}
                             </div>
@@ -58,7 +58,7 @@
 
                 {% include "layouts/other_answers_list.html" with question=question answers=answers %}
 
-                {% include "layouts/answer.html" %}
+                {% include "components/answer.html" %}
 
 
             </div>
