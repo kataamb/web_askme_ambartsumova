@@ -13,7 +13,7 @@
     {% endfor %}
 
     {% block pagination %}
-        {% include "layouts/pagination.html" with page_obj=answers page_content='question' page_id=question.id %}
+        {% include "components/pagination.html" with page_obj=answers page_content='question' page_id=question.id %}
     {% endblock %}
 
 

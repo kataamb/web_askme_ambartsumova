@@ -24,5 +24,5 @@
         {% endblock %}
 
         {% block pagination %}
-            {% include "layouts/pagination_id.html" with page_obj=questions page_content='tag' page_id=tag_name %}
+            {% include "components/pagination.html" with page_obj=questions page_content='tag' page_id=tag_name %}
         {% endblock %}
