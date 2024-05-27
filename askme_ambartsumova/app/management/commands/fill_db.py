@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ratio = options['ratio']
 
-        '''
+
 
         USER_DATA = [User( username=f"username{i}", password=f"password{i}" ) for i in range(ratio)]
         User.objects.bulk_create(USER_DATA)
@@ -48,9 +48,9 @@ class Command(BaseCommand):
 
         Answer.objects.bulk_create(ANSWERS)
 
-        '''
 
-        '''
+
+
         #create question likes
 
         QuestionLike.objects.all().delete()
@@ -122,7 +122,7 @@ class Command(BaseCommand):
             qs_sl = UPD_QUESTIONS[i * batch_s: (i + 1) * batch_s]
             Question.objects.bulk_update(qs_sl, likes_change, batch_size=batch_s)
             print(f"Success updated {i}-s part")
-        '''
+
 
 
 

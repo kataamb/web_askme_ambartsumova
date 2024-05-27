@@ -4,8 +4,17 @@ from datetime import date
 
 # Create your models here.
 
-class ProfileManager(models.Manager):
+class UserManager(models.Manager):
     pass
+    '''
+    def get_by_username(self, username):
+        return self.filter(user__username=username)
+    '''
+
+class ProfileManager(models.Manager):
+    def get_by_username(self, username):
+        return self.filter(user__username=username)
+
 
 class Profile(models.Model):
     avatar = models.ImageField(null=True, blank=True)
@@ -38,11 +47,14 @@ class Tag(models.Model):
 
 class QuestionManager(models.Manager):
     def hot_questions(self):
-        return self.filter(likes_count__gte=4).order_by('-likes_count')
+        return self.order_by('-likes_count')
     def new_questions(self):
-        return self.filter(likes_count__gte=4)
+        return self.order_by('-created_at')
     def get_by_tag(self, tag_slug):
         return self.filter(tags__name=tag_slug)
+
+    def get_by_pk(self, question_id):
+        return self.get(id=question_id)
 
 
 class Question(models.Model):
@@ -50,6 +62,8 @@ class Question(models.Model):
     text_body = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
     likes_count = models.IntegerField()
+
+
 
     tags = models.ManyToManyField(Tag, blank=True)
 
@@ -84,8 +98,10 @@ class QuestionLike(models.Model):
 
 
 class AnswerManager(models.Manager):
-    def get_by_question(self):
-        pass
+    def get_by_question(self, question_id):
+        return self.filter(question__id=question_id).order_by('-created_at')
+
+    #return self.filter(tags__name=tag_slug)
 
 class Answer(models.Model):
     text_body = models.CharField(max_length=1000)

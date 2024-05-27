@@ -1,10 +1,16 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.core.paginator import EmptyPage, PageNotAnInteger
 
 from app.models import*
 
+from django.urls import reverse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth import login, authenticate
+
+from app.forms import*
 
 
 
@@ -25,6 +31,7 @@ QUESTIONS = [
 ]
 '''
 
+'''
 ANSWERS = [
     {
         "id" : i,
@@ -33,7 +40,7 @@ ANSWERS = [
         "likes_count":1
     } for i in range(200)
 ]
-
+'''
 
 def paginate(objects_list, request, per_page=10):
     page_num = request.GET.get('page', 1)
@@ -41,17 +48,13 @@ def paginate(objects_list, request, per_page=10):
 
     try:
         page_obj = paginator.page(page_num)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(1)
-    except Exception:
+    except (PageNotAnInteger, EmptyPage, Exception):
         page_obj = paginator.page(1)
 
 
     return page_obj
 
-
+@login_required()
 def index(request):
     QUESTIONS = Question.objects.new_questions()
 
@@ -63,8 +66,23 @@ def hot(request):
     questions = paginate(QUESTIONS, request, 5)
     return render(request, template_name="hot.html", context={"questions" : questions})
 
-def login(request):
-    return render(request, template_name="login.html")
+@require_http_methods(['GET', 'POST'])
+def log_in(request):
+    if request.method == 'GET':
+        login_form = LoginForm()
+    if request.method == 'POST':
+        login_form = LoginForm(data=request.POST)
+        if login_form.is_valid():
+            print(login_form.cleaned_data)
+
+            user = authenticate(request, **login_form.cleaned_data)
+
+            if user:
+                login(request, user)
+                return redirect(reverse('index'))
+        print('Failed to login')
+    #return render(request, "login.html", context={"form": login_form})
+    return render(request, template_name="login.html", context={"form" : login_form})
 
 def register(request):
     return render(request, template_name="signup.html")
@@ -77,10 +95,9 @@ def settings(request):
 
 
 def question(request, question_id):
-    QUESTIONS = Question.objects.all()
-
-    question = QUESTIONS[question_id]
-    answers = paginate(ANSWERS[:10], request, 2)
+    question = Question.objects.get_by_pk(question_id)
+    ANSWERS = Answer.objects.get_by_question(question_id)
+    answers = paginate(ANSWERS, request, 2)
     return render(request, template_name="question.html", context={"question": question, "answers": answers})
 
 def tag(request, tag_slug):
