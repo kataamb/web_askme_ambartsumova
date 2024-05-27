@@ -4,6 +4,10 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.core.paginator import EmptyPage, PageNotAnInteger
 
+from django.contrib.auth.decorators import login_required
+
+from django.contrib import auth
+
 from app.models import*
 
 from django.urls import reverse
@@ -54,7 +58,7 @@ def paginate(objects_list, request, per_page=10):
 
     return page_obj
 
-@login_required()
+@login_required
 def index(request):
     QUESTIONS = Question.objects.new_questions()
 
@@ -66,6 +70,7 @@ def hot(request):
     questions = paginate(QUESTIONS, request, 5)
     return render(request, template_name="hot.html", context={"questions" : questions})
 
+
 @require_http_methods(['GET', 'POST'])
 def log_in(request):
     if request.method == 'GET':
@@ -73,7 +78,6 @@ def log_in(request):
     if request.method == 'POST':
         login_form = LoginForm(data=request.POST)
         if login_form.is_valid():
-            print(login_form.cleaned_data)
 
             user = authenticate(request, **login_form.cleaned_data)
 
@@ -84,14 +88,52 @@ def log_in(request):
     #return render(request, "login.html", context={"form": login_form})
     return render(request, template_name="login.html", context={"form" : login_form})
 
+@require_http_methods(['GET', 'POST'])
 def register(request):
-    return render(request, template_name="signup.html")
+    if request.method == 'GET':
+        user_form = RegisterForm()
+    if request.method == 'POST':
+        user_form = RegisterForm(request.POST, request.FILES)
+
+        if user_form.is_valid():
+            print(user_form.cleaned_data)
+            user = user_form.save()
+            if user:
+                return redirect(reverse('index'))
+            else:
+                user_form.add_error(field=None, error="User saving error!")
+    return render(request, "signup.html", {'form': user_form})
+
+
+
+
+def logout(request):
+    auth.logout(request)
+    return redirect(reverse('login'))
+
+
 
 def ask(request):
     return render(request, template_name="ask.html")
 
 def settings(request):
     return render(request, template_name="settings.html")
+
+def edit_profile(request):
+    if request.method == 'GET':
+        user_form = EditForm()
+    if request.method == 'POST':
+        user_form = EditForm(request.POST, request.FILES)
+
+        if user_form.is_valid():
+
+            user = user_form.save()
+            if user:
+                return redirect(reverse('index'))
+            else:
+                user_form.add_error(field=None, error="User saving error!")
+    return render(request, template_name="edit_profile.html", context={'form': user_form})
+    #return render(request, template_name="edit_profile.html")
 
 
 def question(request, question_id):

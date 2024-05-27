@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 {% load static %}
-{% load bootstrap5 %}
+{% load bootstrap4 %}
 
         {% block user_head %}
              {% include "components/authorized_block.html" %}
@@ -66,7 +66,7 @@
                      <div class="mb-3 row">
                         <div class="col-sm-3">&nbsp;</div>
                         <div class="col-sm-9">
-                          <button id = btnSettings class = "btn btn-outline-success my_color_div" type="submit" >Save</button>
+                          <a href="{% url 'edit_profile' %}">Edit</a>
                         </div>
                      </div>
 
