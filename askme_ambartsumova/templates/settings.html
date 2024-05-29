@@ -3,14 +3,14 @@
 {% load bootstrap4 %}
 
         {% block user_head %}
-             {% include "components/authorized_block.html" %}
+             {% include "components/authorized_block.html" with user=user profile=profile %}
         {% endblock %}
 
         {% block title %}
        <!--- category preaheader" -->
         <div class = "row-1 m-5 d-flex gap-3 align-items-left">
             <h2> Settings: </h2>
-            <h2> Dr. Pepper </h2>
+            <h2> {{user.username}} </h2>
         </div>
         {% endblock %}
 
@@ -23,21 +23,21 @@
                      <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">Login</label>
                         <div class="col-sm-9">
-                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="dr_pepper" id="loginSettings">
+                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="{{profile.login}}" id="loginSettings">
                         </div>
                      </div>
 
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">Email</label>
                         <div class="col-sm-9">
-                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="dr.pepper@mail.ru" id="emailSettings">
+                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="{{user.email}}" id="emailSettings">
                         </div>
                     </div>
 
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">NickName</label>
                         <div class="col-sm-9">
-                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="Dr. Pepper" id="nicknameSettings">
+                          <input type="email" class="form-control" aria-describedby="emailHelp" maxlength="50" placeholder="{{user.first_name}}" id="nicknameSettings">
                         </div>
                     </div>
 

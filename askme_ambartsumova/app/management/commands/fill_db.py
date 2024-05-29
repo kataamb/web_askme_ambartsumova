@@ -15,7 +15,13 @@ class Command(BaseCommand):
 
 
         USER_DATA = [User( username=f"username{i}", password=f"password{i}" ) for i in range(ratio)]
-        User.objects.bulk_create(USER_DATA)
+        #User.objects.bulk_create(USER_DATA)
+        batch_s = 100
+        for i in range(len(USER_DATA) // batch_s):
+            qs_sl = USER_DATA[i * batch_s: (i + 1) * batch_s]
+            User.objects.bulk_create(qs_sl)
+            print(f"Success added {i}-s part users")
+        print("ADDED USERS")
 
         #create users (profiles)
         USER_PROFILES = User.objects.all()
@@ -27,35 +33,64 @@ class Command(BaseCommand):
         TAGS = [ Tag( name=f"tag{i}" ) for i in range(ratio) ]
 
         ##############################################
-        Profile.objects.bulk_create(USERS)
-        Tag.objects.bulk_create(TAGS)
+        #Profile.objects.bulk_create(USERS)
+        batch_s = 100
+        for i in range(len(USERS) // batch_s):
+            qs_sl = USERS[i * batch_s: (i + 1) * batch_s]
+            Profile.objects.bulk_create(qs_sl)
+            print(f"Success added {i}-s part profiles")
+        print("ADDED Profiles")
+
+
+        #Tag.objects.bulk_create(TAGS)
+        batch_s = 100
+        for i in range(len(TAGS) // batch_s):
+            qs_sl = TAGS[i * batch_s: (i + 1) * batch_s]
+            Tag.objects.bulk_create(qs_sl)
+            print(f"Success added {i}-s part TAGS")
+        print("ADDED TAGS")
 
         # create questions
+        PROFILES = Profile.objects.all()
 
         QUESTIONS = [Question( title = f"Question number {i}", text_body = f"Question text {i}",
-                               likes_count = 0)
+                               likes_count = 0, user = PROFILES[i % len(PROFILES)])
                      for i in range(ratio * 10)]
 
-        Question.objects.bulk_create(QUESTIONS)
+        #Question.objects.bulk_create(QUESTIONS)
+        batch_s = 100
+        for i in range(len(QUESTIONS) // batch_s):
+            qs_sl = QUESTIONS[i * batch_s: (i + 1) * batch_s]
+            Question.objects.bulk_create(qs_sl)
+            print(f"Success added {i}-s part QUESTIONS")
+        print("ADDED QUESTIONS")
 
 
         # create answers
         QUESTIONS = Question.objects.all()
         q_len = len(QUESTIONS)
+
+        PROFILES = Profile.objects.all()
         ANSWERS = [Answer( text_body = f"This is answer body {i}",
                            question = QUESTIONS[ random.randint(0, q_len-1) ],
-                           likes_count = 0) for i in range(ratio * 100 )]
+                           likes_count = 0, user = PROFILES[i % len(PROFILES)]) for i in range(ratio * 100 )]
 
-        Answer.objects.bulk_create(ANSWERS)
+        #Answer.objects.bulk_create(ANSWERS)
+        batch_s = 100
+        for i in range(len(ANSWERS) // batch_s):
+            qs_sl = ANSWERS[i * batch_s: (i + 1) * batch_s]
+            Answer.objects.bulk_create(qs_sl)
+            print(f"Success added {i}-s part ANSWERS")
+        print("ADDED ANSWERS")
 
 
 
 
         #create question likes
 
-        QuestionLike.objects.all().delete()
+        #QuestionLike.objects.all().delete()
 
-        print("DELETED")
+        #print("DELETED")
 
 
         USERS = Profile.objects.all()
@@ -103,8 +138,8 @@ class Command(BaseCommand):
         for i in range(len(QUESTION_LIKES) // batch_s):
             qs_sl = QUESTION_LIKES[i * batch_s: (i + 1) * batch_s]
             QuestionLike.objects.bulk_create(qs_sl)
-            print(f"Success added {i}-s part")
-        print("ADDED")
+            print(f"Success added {i}-s part QUESTION_LIKES")
+        print("ADDED QUESTION_LIKES")
 
 
         #update questions
@@ -121,20 +156,17 @@ class Command(BaseCommand):
         for i in range(len(QUESTIONS) // batch_s):
             qs_sl = UPD_QUESTIONS[i * batch_s: (i + 1) * batch_s]
             Question.objects.bulk_update(qs_sl, likes_change, batch_size=batch_s)
-            print(f"Success updated {i}-s part")
+            print(f"Success updated {i}-s part QUESTIONS")
 
 
 
 
-
-
-        '''
 
         # create answer likes
 
-        AnswerLike.objects.all().delete()
+        #AnswerLike.objects.all().delete()
 
-        print("DELETED")
+        #print("DELETED")
 
         USERS = Profile.objects.all()
         ANSWERS = Answer.objects.all()
@@ -177,8 +209,8 @@ class Command(BaseCommand):
         for i in range(len(ANSWER_LIKES) // batch_s):
             ans_sl = ANSWER_LIKES[i * batch_s: (i + 1) * batch_s]
             AnswerLike.objects.bulk_create(ans_sl)
-            print(f"Success added {i}-s part")
-        print("ADDED")
+            print(f"Success added {i}-s part ANSWER_LIKES")
+        print("ADDED ANSWER_LIKES")
         # update questions
         UPD_ANSWERS = []
         for item in UPDATED_ANSWERS:
@@ -198,14 +230,16 @@ class Command(BaseCommand):
         for i in range(len(ANSWERS) // batch_s):
             ans_sl = UPD_ANSWERS[i * batch_s: (i + 1) * batch_s]
             Answer.objects.bulk_update(ans_sl, likes_change, batch_size=batch_s)
-            print(f"Success updated {i}-s part")
+            print(f"Success updated {i}-s part ANSWERS")
 
 
         # Answer.objects.bulk_update(UPD_ANSWERS,likes_change, 1000)
 
-        print("UPDATED")
-        
-        '''
+        print("UPDATED ANSWERS")
+
+
+
+        #TAGS AND QUESTIONS UPDATE
 
         TAGS = Tag.objects.all()
 
@@ -230,7 +264,7 @@ class Command(BaseCommand):
          #   q_sl = QUESTIONS[i * batch_s: (i + 1) * batch_s]
           #  Question.objects.bulk_update(q_sl, tags_change, batch_size=batch_s)
            # print(f"Success updated {i}-s part")
-            
+
 
 
 

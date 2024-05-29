@@ -19,6 +19,7 @@ class LoginForm(forms.Form):
 
 
 class RegisterForm(forms.ModelForm):
+    login = CharField()
     password = forms.CharField(widget=forms.PasswordInput) # to change widget
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     avatar = forms.ImageField(allow_empty_file=True)
@@ -27,12 +28,18 @@ class RegisterForm(forms.ModelForm):
         fields = ['username', 'email', 'first_name', 'password' ]
 
     def save(self, commit=True):
-
         user = super().save(commit=False)
 
         user.set_password(self.cleaned_data['password'])
         user.save()
-        return user
+
+        profile = Profile(avatar=self.cleaned_data['avatar'],
+                          login=self.cleaned_data['login'],
+                          user=user)
+        profile.save()
+
+        return [user, profile]
+
 
     def clean(self):
         super().clean()
@@ -44,20 +51,114 @@ class RegisterForm(forms.ModelForm):
             raise ValidationError("Passwords do not match")
 
 
-
-
 class EditForm(forms.ModelForm):
+    login = CharField()
     avatar = forms.ImageField(allow_empty_file=True)
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name' ]
+        fields = ['username', 'email', 'first_name']
 
     def save(self, commit=True):
+        #user = super().save(commit=False)
 
-        user = super().save(commit=False)
 
-        user.save()
-        return user
+
+
+        '''profile = Profile(avatar=self.cleaned_data['avatar'],
+                          login=self.cleaned_data['login'],
+                          user=user)'''
+
+
+        #return [user, profile]
+
+
 
     def clean(self):
         super().clean()
+
+
+
+
+
+
+class QuestionForm(forms.ModelForm):
+    text_body = forms.CharField(widget=forms.TextInput, max_length=255)  # to change widget
+    tags = forms.CharField(max_length=255)
+    class Meta:
+        model = Question
+        fields = ['title', 'text_body']
+
+    def __init__(self, profile, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.profile = profile
+
+
+    def clean(self):
+
+        super().clean()
+
+        tags_list = self.cleaned_data["tags"]
+        tags_list = [i.strip() for i in tags_list.split(",")]
+
+        if len(tags_list) > 3:
+            raise ValidationError("Too many tags!")
+
+        tag_objs = Tag.objects
+
+        lst = []
+
+        for tag in tags_list:
+            tg = tag_objs.get_tag_by_name(tag)
+            if not tg:
+                raise ValidationError(f"Tag {tag} doesn't exsist!")
+            lst.append(tg[0])
+
+        self.cleaned_data["tags"] = lst
+
+        print(lst)
+
+
+    def save(self, commit=True):
+        question = super().save(commit=False)
+        #question = Question(title = self.)
+
+        question.user = self.profile
+        question.likes_count = 0
+
+        question.save()
+
+        tags = self.cleaned_data["tags"]
+        question.tags.add(*tags)
+
+        return question
+
+
+
+
+
+class AnswerForm(forms.ModelForm):
+    text_body = forms.CharField(widget=forms.TextInput, max_length=255)  # to change widget
+    class Meta:
+        model = Answer
+        fields = ['text_body']
+
+    def __init__(self, profile, question, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.profile = profile
+        self.question = question
+
+
+    def clean(self):
+        super().clean()
+
+
+    def save(self, commit=True):
+        answer = super().save(commit=False)
+
+        answer.user = self.profile
+        answer.question = self.question
+        answer.likes_count = 0
+
+        answer.save()
+
+        return answer

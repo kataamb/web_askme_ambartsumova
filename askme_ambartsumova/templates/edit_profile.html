@@ -3,14 +3,14 @@
 {% load bootstrap4 %}
 
         {% block user_head %}
-             {% include "components/authorized_block.html" %}
+             {% include "components/authorized_block.html" with user=user profile=profile %}
         {% endblock %}
 
         {% block title %}
        <!--- category preaheader" -->
         <div class = "row-1 m-5 d-flex gap-3 align-items-left">
             <h2> Settings: </h2>
-            <h2> Dr. Pepper </h2>
+            <h2> {{user.username}} </h2>
         </div>
         {% endblock %}
 

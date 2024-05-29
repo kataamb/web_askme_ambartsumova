@@ -2,7 +2,11 @@
 {% load static %}
 
         {% block user_head %}
-            {% include "components/authorized_block.html" %}
+            {% if user.is_authenticated %}
+                {% include "components/authorized_block.html" with user=user profile=profile %}
+            {% else %}
+                {% include "components/unauthorized_block.html" %}
+            {% endif %}
         {% endblock %}
 
         {% block title %}

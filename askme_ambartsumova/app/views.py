@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.decorators import login_required
@@ -16,35 +16,24 @@ from django.contrib.auth import login, authenticate
 
 from app.forms import*
 
+from django.contrib import auth
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+
+# Create your views here.
+from django.urls import reverse
+from django.views.decorators.http import require_http_methods
+
+from app.forms import LoginForm, RegisterForm
 
 
 
-TAGS = [
-{
-       "name" : i,
-    } for i in ['bender', 'python', 'django', 'TechnoPark']
-]
-'''
-QUESTIONS = [
-    {
-        "id" : i,
-        "title" : f"Question {i}",
-        "text" : f"This is question number {i}",
-        "tags": TAGS[:3],
-    } for i in range(200)
-]
-'''
 
-'''
-ANSWERS = [
-    {
-        "id" : i,
-        "title" : f"Answer {i}",
-        "text" : f"This is answer number {i}",
-        "likes_count":1
-    } for i in range(200)
-]
-'''
+
 
 def paginate(objects_list, request, per_page=10):
     page_num = request.GET.get('page', 1)
@@ -58,17 +47,28 @@ def paginate(objects_list, request, per_page=10):
 
     return page_obj
 
-@login_required
+
 def index(request):
     QUESTIONS = Question.objects.new_questions()
 
     questions = paginate(QUESTIONS, request)
-    return render(request, template_name="index.html", context={"questions" : questions})
+
+    #print(request.user.username)
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
+    print(profile)
+    return render(request, template_name="index.html",
+                  context={"questions": questions, "user": request.user, "profile": profile})
 
 def hot(request):
     QUESTIONS = Question.objects.hot_questions()
     questions = paginate(QUESTIONS, request, 5)
-    return render(request, template_name="hot.html", context={"questions" : questions})
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
+    return render(request, template_name="hot.html",
+                  context={"questions": questions, "user": request.user, "profile": profile})
 
 
 @require_http_methods(['GET', 'POST'])
@@ -96,9 +96,9 @@ def register(request):
         user_form = RegisterForm(request.POST, request.FILES)
 
         if user_form.is_valid():
-            print(user_form.cleaned_data)
-            user = user_form.save()
+            user, profile = user_form.save()
             if user:
+                #####create profile
                 return redirect(reverse('index'))
             else:
                 user_form.add_error(field=None, error="User saving error!")
@@ -106,7 +106,7 @@ def register(request):
 
 
 
-
+@login_required(login_url="/login/")
 def logout(request):
     auth.logout(request)
     return redirect(reverse('login'))
@@ -114,36 +114,97 @@ def logout(request):
 
 
 def ask(request):
-    return render(request, template_name="ask.html")
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
 
+    if request.method == 'GET':
+        question_form = QuestionForm(profile)
+    if request.method == 'POST':
+        question_form = QuestionForm(profile, data=request.POST)
+        if question_form.is_valid():
+            question = question_form.save()
+            if question:
+                return redirect( reverse('question', args=[question.id]) )
+            else:
+                question_form.add_error(field=None, error="Question saving error!")
+
+    return render(request, template_name="ask.html",
+                  context={"user": request.user, "profile": profile, 'form': question_form})
+
+
+@login_required(login_url="/login/")
 def settings(request):
-    return render(request, template_name="settings.html")
+    #print(request.user)
+    #if not request.user.is_authenticated:
+    #    return HttpResponseRedirect('/login/')
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
 
+    return render(request, template_name="settings.html",
+                  context={'user': request.user, 'profile': profile})
+
+@login_required(login_url="/login/")
 def edit_profile(request):
     if request.method == 'GET':
         user_form = EditForm()
     if request.method == 'POST':
         user_form = EditForm(request.POST, request.FILES)
-
         if user_form.is_valid():
-
             user = user_form.save()
             if user:
                 return redirect(reverse('index'))
             else:
                 user_form.add_error(field=None, error="User saving error!")
-    return render(request, template_name="edit_profile.html", context={'form': user_form})
+
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
+    print(profile)
+    return render(request, template_name="edit_profile.html",
+                  context={'form': user_form, 'user': request.user, "profile":profile})
     #return render(request, template_name="edit_profile.html")
 
-
+@require_http_methods(['GET', 'POST'])
+@login_required(login_url="/login/")
 def question(request, question_id):
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
+
     question = Question.objects.get_by_pk(question_id)
+
+
+    if request.method == 'GET':
+        answer_form = AnswerForm(profile, question)
+    if request.method == 'POST':
+        answer_form = AnswerForm(profile, question, data=request.POST)
+        if answer_form.is_valid():
+            answer = answer_form.save()
+            if answer:
+                return redirect( reverse('question', args=[question.id]) )
+            else:
+                answer_form.add_error(field=None, error="Answer saving error!")
+
+
+
     ANSWERS = Answer.objects.get_by_question(question_id)
     answers = paginate(ANSWERS, request, 2)
-    return render(request, template_name="question.html", context={"question": question, "answers": answers})
+
+    return render(request, template_name="question.html",
+                  context={'form': answer_form, "question": question, "answers": answers,
+                           'user': request.user, "profile": profile})
 
 def tag(request, tag_slug):
     QUESTIONS = Question.objects.get_by_tag(tag_slug)
     questions = paginate(QUESTIONS, request)
-    return render(request, template_name="tag.html", context={"tag_name": tag_slug, "questions": questions})
+
+    profile = Profile.objects.get_by_username(request.user.username)
+    if profile:
+        profile = profile[0]
+    print(profile)
+    return render(request, template_name="tag.html",
+                  context={"tag_name": tag_slug, "questions": questions,
+                           'user': request.user, "profile": profile})
 

@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 
+#from keyring.backends import null
+
+
 # Create your models here.
 
 class UserManager(models.Manager):
@@ -14,12 +17,14 @@ class UserManager(models.Manager):
 class ProfileManager(models.Manager):
     def get_by_username(self, username):
         return self.filter(user__username=username)
+    def get_by_user(self, user):
+        return self.filter(user=user)
 
 
 class Profile(models.Model):
     avatar = models.ImageField(null=True, blank=True)
-    login = models.CharField(max_length=25)
-    email = models.CharField(max_length=30)
+    login = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -33,10 +38,11 @@ class Profile(models.Model):
 
 
 class TagManager(models.Manager):
-    pass
+    def get_tag_by_name(self, name):
+        return self.filter(name=name)
 
 class Tag(models.Model):
-    name = models.CharField(max_length=15)
+    name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = TagManager()
@@ -51,7 +57,7 @@ class QuestionManager(models.Manager):
     def new_questions(self):
         return self.order_by('-created_at')
     def get_by_tag(self, tag_slug):
-        return self.filter(tags__name=tag_slug)
+        return self.filter(tags__name=tag_slug).order_by('-created_at')
 
     def get_by_pk(self, question_id):
         return self.get(id=question_id)
@@ -67,6 +73,9 @@ class Question(models.Model):
 
     tags = models.ManyToManyField(Tag, blank=True)
 
+    #user = models.ForeignKey(Profile, on_delete=models.CASCADE, default="", null=True, blank=True)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
     objects = QuestionManager()
 
 
@@ -81,7 +90,8 @@ class QuestionLikeManager(models.Manager):
     pass
 
 class QuestionLike(models.Model):
-    value = models.IntegerField()
+    LIKES_VALUES = [(-1, -1), (1, 1)]
+    value = models.IntegerField(choices=LIKES_VALUES)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
@@ -111,6 +121,8 @@ class Answer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
+    #user = models.ForeignKey(Profile, on_delete=models.CASCADE, default="", null=True, blank=True)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     objects = AnswerManager()
 
@@ -126,7 +138,8 @@ class AnswerLikeManager(models.Manager):
 
 
 class AnswerLike(models.Model):
-    value = models.IntegerField()
+    LIKES_VALUES = [(-1, -1), (1, 1)]
+    value = models.IntegerField(choices=LIKES_VALUES)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
