@@ -51,7 +51,7 @@ def paginate(objects_list, request, per_page=10):
 def index(request):
     QUESTIONS = Question.objects.new_questions()
 
-    questions = paginate(QUESTIONS, request)
+    questions = paginate(QUESTIONS, request, 2)
 
     #print(request.user.username)
     profile = Profile.objects.get_by_username(request.user.username)

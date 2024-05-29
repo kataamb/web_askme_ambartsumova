@@ -22,7 +22,7 @@ class ProfileManager(models.Manager):
 
 
 class Profile(models.Model):
-    avatar = models.ImageField(null=True, blank=True)
+    avatar = models.ImageField(null=True, blank=True, upload_to="images", default="avatar.png")
     login = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
