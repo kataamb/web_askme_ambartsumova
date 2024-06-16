@@ -30,6 +30,7 @@ from django.views.decorators.http import require_http_methods
 
 from app.forms import LoginForm, RegisterForm
 
+from django.views.decorators.csrf import csrf_protect
 
 
 
@@ -47,7 +48,7 @@ def paginate(objects_list, request, per_page=10):
 
     return page_obj
 
-
+@csrf_protect
 def index(request):
     QUESTIONS = Question.objects.new_questions()
 
@@ -55,22 +56,20 @@ def index(request):
 
     #print(request.user.username)
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
-    print(profile)
+
     return render(request, template_name="index.html",
                   context={"questions": questions, "user": request.user, "profile": profile})
 
+@csrf_protect
 def hot(request):
     QUESTIONS = Question.objects.hot_questions()
     questions = paginate(QUESTIONS, request, 5)
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
+
     return render(request, template_name="hot.html",
                   context={"questions": questions, "user": request.user, "profile": profile})
 
-
+@csrf_protect
 @require_http_methods(['GET', 'POST'])
 def log_in(request):
     if request.method == 'GET':
@@ -88,6 +87,7 @@ def log_in(request):
     #return render(request, "login.html", context={"form": login_form})
     return render(request, template_name="login.html", context={"form" : login_form})
 
+@csrf_protect
 @require_http_methods(['GET', 'POST'])
 def register(request):
     if request.method == 'GET':
@@ -99,24 +99,23 @@ def register(request):
             user, profile = user_form.save()
             if user:
                 #####create profile
-                return redirect(reverse('index'))
+                return redirect(reverse('login'))
             else:
                 user_form.add_error(field=None, error="User saving error!")
     return render(request, "signup.html", {'form': user_form})
 
 
-
+@csrf_protect
 @login_required(login_url="/login/")
 def logout(request):
     auth.logout(request)
     return redirect(reverse('login'))
 
 
-
+@csrf_protect
+@login_required(login_url="/login/")
 def ask(request):
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
 
     if request.method == 'GET':
         question_form = QuestionForm(profile)
@@ -132,25 +131,27 @@ def ask(request):
     return render(request, template_name="ask.html",
                   context={"user": request.user, "profile": profile, 'form': question_form})
 
-
+@csrf_protect
 @login_required(login_url="/login/")
 def settings(request):
     #print(request.user)
     #if not request.user.is_authenticated:
     #    return HttpResponseRedirect('/login/')
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
 
     return render(request, template_name="settings.html",
                   context={'user': request.user, 'profile': profile})
 
+@csrf_protect
 @login_required(login_url="/login/")
 def edit_profile(request):
+    profile = Profile.objects.get_by_user(request.user)
+    print(profile, request.user)
+
     if request.method == 'GET':
-        user_form = EditForm()
+        user_form = EditForm(profile)
     if request.method == 'POST':
-        user_form = EditForm(request.POST, request.FILES)
+        user_form = EditForm(profile, request.POST, request.FILES)
         if user_form.is_valid():
             user = user_form.save()
             if user:
@@ -158,23 +159,18 @@ def edit_profile(request):
             else:
                 user_form.add_error(field=None, error="User saving error!")
 
-    profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
-    print(profile)
+
     return render(request, template_name="edit_profile.html",
-                  context={'form': user_form, 'user': request.user, "profile":profile})
+                  context={'form': user_form, 'user': request.user, "profile": profile})
     #return render(request, template_name="edit_profile.html")
 
+@csrf_protect
 @require_http_methods(['GET', 'POST'])
 @login_required(login_url="/login/")
 def question(request, question_id):
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
 
     question = Question.objects.get_by_pk(question_id)
-
 
     if request.method == 'GET':
         answer_form = AnswerForm(profile, question)
@@ -195,15 +191,13 @@ def question(request, question_id):
     return render(request, template_name="question.html",
                   context={'form': answer_form, "question": question, "answers": answers,
                            'user': request.user, "profile": profile})
-
+@csrf_protect
 def tag(request, tag_slug):
     QUESTIONS = Question.objects.get_by_tag(tag_slug)
     questions = paginate(QUESTIONS, request)
 
     profile = Profile.objects.get_by_username(request.user.username)
-    if profile:
-        profile = profile[0]
-    print(profile)
+
     return render(request, template_name="tag.html",
                   context={"tag_name": tag_slug, "questions": questions,
                            'user': request.user, "profile": profile})

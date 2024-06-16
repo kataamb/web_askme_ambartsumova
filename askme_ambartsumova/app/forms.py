@@ -3,6 +3,8 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms import CharField
 
+from django.contrib.auth.hashers import check_password
+
 from app.models import *
 
 
@@ -13,7 +15,16 @@ class LoginForm(forms.Form):
     def clean(self):
         super().clean()
 
-        user = User.objects.get(username = self.cleaned_data['username'])
+        user = Profile.objects.get_by_username( self.cleaned_data['username'] )
+
+        if not user:
+            raise ValidationError("No such user")
+
+
+        # check password in log in
+        password = self.cleaned_data['password']
+        if not check_password(password, user.user.password):
+            raise ValidationError("Incorrect password")
 
 
 
@@ -51,25 +62,33 @@ class RegisterForm(forms.ModelForm):
             raise ValidationError("Passwords do not match")
 
 
-class EditForm(forms.ModelForm):
+class EditForm(forms.Form):
     login = CharField()
+    username = CharField()
+    email = CharField()
+    first_name = CharField()
     avatar = forms.ImageField(allow_empty_file=True)
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'first_name']
+
+
+    def __init__(self, profile, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.profile = profile
+        print(profile)
 
     def save(self, commit=True):
-        #user = super().save(commit=False)
+        print(self.cleaned_data)
+        self.profile.user.username = self.cleaned_data['username']
+        self.profile.user.username = self.cleaned_data['email']
+        self.profile.user.username = self.cleaned_data['first_name']
+
+        self.profile.user.save()
+        print(self.profile.user.username, self.profile.user.first_name)
 
 
+        self.profile.avatar, self.profile.login = self.cleaned_data['avatar'], self.cleaned_data['login']
+        self.profile.save()
 
-
-        '''profile = Profile(avatar=self.cleaned_data['avatar'],
-                          login=self.cleaned_data['login'],
-                          user=user)'''
-
-
-        #return [user, profile]
+        return self.profile
 
 
 
@@ -110,7 +129,12 @@ class QuestionForm(forms.ModelForm):
         for tag in tags_list:
             tg = tag_objs.get_tag_by_name(tag)
             if not tg:
-                raise ValidationError(f"Tag {tag} doesn't exsist!")
+                #raise ValidationError(f"Tag {tag} doesn't exsist!")
+                # if no tag, create  and add to db
+                new_tag = Tag(name=tag)
+                new_tag.save()
+                # get from db
+                tg = tag_objs.get_tag_by_name(tag)
             lst.append(tg[0])
 
         self.cleaned_data["tags"] = lst

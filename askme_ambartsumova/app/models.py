@@ -16,9 +16,16 @@ class UserManager(models.Manager):
 
 class ProfileManager(models.Manager):
     def get_by_username(self, username):
-        return self.filter(user__username=username)
+        profile = self.filter(user__username=username)
+        if profile:
+            profile = profile[0]
+        return profile
+
     def get_by_user(self, user):
-        return self.filter(user=user)
+        profile = self.filter(user=user)
+        if profile:
+            profile = profile[0]
+        return profile
 
 
 class Profile(models.Model):
