@@ -63,8 +63,8 @@ class RegisterForm(forms.ModelForm):
 
 
 class EditForm(forms.Form):
-    login = CharField()
     username = CharField()
+    login = CharField()
     email = CharField()
     first_name = CharField()
     avatar = forms.ImageField(allow_empty_file=True)
@@ -78,8 +78,8 @@ class EditForm(forms.Form):
     def save(self, commit=True):
         print(self.cleaned_data)
         self.profile.user.username = self.cleaned_data['username']
-        self.profile.user.username = self.cleaned_data['email']
-        self.profile.user.username = self.cleaned_data['first_name']
+        self.profile.user.email = self.cleaned_data['email']
+        self.profile.user.first_name = self.cleaned_data['first_name']
 
         self.profile.user.save()
         print(self.profile.user.username, self.profile.user.first_name)
